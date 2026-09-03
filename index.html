@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSF | Jovenes Sin Fronteras</title>
+    <link rel="shortcut icon" href="img/JSF LOGO VECTOR6.png" type="image/x-icon">
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background: #111111; }
+        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 1rem; font-weight: bold; }
+        input { width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 0.75rem; margin-top: 1.5rem; background: #000000; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+        button:hover { background: #ffd000; }
+        .link { display: block; text-align: center; margin-top: 1rem; }
+        .link a { color: #000; text-decoration: underline; }
+        #mensaje { text-align: center; margin-top: 1rem; color: green; }
+        .error { color: red; }
+        span{color: #ffe600;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Registrarse <span>JSF</span></h2>
+    <form id="registroForm">
+        <label for="nombre">Nombres:</label>
+        <input type="text" id="nombre" required placeholder="Ej. Irving Xavier">
+
+        <label for="apellido">Apellidos:</label>
+        <input type="text" id="apellido" required placeholder="Ej. Sul Tejaxún">
+
+        <label for="fecha">Fecha de Nacimiento:</label>
+        <input type="date" id="fecha" required>
+
+        <button type="submit">Guardar Datos</button>
+    </form>
+    <p id="mensaje"></p>
+    <div class="link"><a href="admin.html">Ir a ver la base de datos</a></div>
+</div>
+
+<script>
+    // 1. Cargar la librería completa (todo en uno)
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    script.onload = function() {
+        // 2. Inicializar cuando cargue
+        const SUPABASE_URL = 'https://htzqxdpheikegexvarxq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0enF4ZHBoZWlrZWdleHZhcnhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgzOTk0NDksImV4cCI6MjEwMzk3NTQ0OX0.paGbLkxqQ56XKsooPRMCjgWYwYzyLMEvWVhY6Tzjlq4'; // <--- Pega tu clave aquí
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const form = document.getElementById('registroForm');
+        const mensaje = document.getElementById('mensaje');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            mensaje.textContent = "Guardando...";
+            mensaje.style.color = "black";
+
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const fecha = document.getElementById('fecha').value;
+
+            try {
+                // ⚠️ VERIFICA EL NOMBRE: jsf_ipp o jfs_ipp
+                const { data, error } = await supabase
+                    .from('jsf_ipp')
+                    .insert([{ nombre, apellido, fecha_nacimiento: fecha }]);
+
+                if (error) throw error;
+
+                mensaje.textContent = "¡Guardado con éxito!";
+                mensaje.style.color = "green";
+                form.reset();
+
+            } catch (err) {
+                console.error('Error:', err);
+                mensaje.textContent = "Error: " + err.message;
+                mensaje.style.color = "red";
+            }
+        });
+    };
+    document.head.appendChild(script);
+</script>
+
+</body>
+</html>
